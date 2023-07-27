@@ -1,0 +1,13 @@
+name: pyolp
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - numpy
+  - pythonocc-core=7.7.0
+  - pip
+  - pip :
+    - git+https://github.com/Tanneguydv/ikpy
+    - git+https://github.com/tpaviot/pythonocc-utils
+    - python-fcl
+    - pyqt5
