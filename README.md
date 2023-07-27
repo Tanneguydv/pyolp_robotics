@@ -1,4 +1,5 @@
-![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/e60bea8b-bc73-4eab-9e3c-d317f81a622c)
+![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/5838dab0-7230-46e3-baa3-6a66069d5c1d)
+
 # pyolp_robotics
 A 3D graphic tool to sketch serial robots offline programming
 
@@ -17,22 +18,24 @@ The [FCL python wrapper](https://pypi.org/project/python-fcl/) is used with Pyth
 
 ## Examples / tests
 A simple forward kinematic example with sliders
-![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/24fd89eb-fa97-4e0c-90e2-a2948099ad70)
+![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/2507f370-df5f-445f-9de4-24d09a0c2b69)
 
 An example of poses obtained from two frames, and intermediates poses calculated in a linear articular space
-![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/e76a3d35-26cc-4512-b659-8577768184f6)
+![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/91d434b8-7834-4a36-a02f-f3f09d1b18e6)
 
 Another example using the extraction of an edge from a shape to generate poses, similar than a linear one in the cartesian space\
-![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/9832c7f4-81f7-4ced-b7f8-75fbf2fe2cf1)
+![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/be9dc955-b40f-4248-b4b7-fa78f7a5acc1)
 
 A pose computed taking into account the collision environment
-![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/fd4a36e0-1023-4107-bd08-ec19cfce3dbb)
+![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/163cadd9-cd78-401e-a7f8-4c78e822c9f1)
+
 
 The capability to detect self-collision events\
-![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/fa4a757d-8af6-4144-8741-97c23d94eef8)
+![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/6e69d469-0c26-4794-805b-ac1e4d6ce2cb)
+
 
 and finally an example of application, a simple slicer method and poses generation (taken from [pythonocc-demos](https://github.com/tpaviot/pythonocc-demos))
-![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/0c689996-914d-4040-9850-a198f79ec093)
+![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/4611cf42-6a5c-4c87-a645-38d56c867373)
 
 
 ## Installation
