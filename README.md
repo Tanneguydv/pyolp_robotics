@@ -22,7 +22,7 @@ A simple forward kinematic example with sliders
 An example of poses obtained from two frames, and intermediates poses calculated in a linear articular space
 ![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/e76a3d35-26cc-4512-b659-8577768184f6)
 
-Another example using the extraction of an edge from a shape to generate poses, similar than a linear one in the cartesian space
+Another example using the extraction of an edge from a shape to generate poses, similar than a linear one in the cartesian space\
 ![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/9832c7f4-81f7-4ced-b7f8-75fbf2fe2cf1)
 
 A pose computed taking into account the collision environment
