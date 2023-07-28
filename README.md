@@ -1,11 +1,11 @@
 ![image](https://github.com/Tanneguydv/pyolp_robotics/assets/81742654/5838dab0-7230-46e3-baa3-6a66069d5c1d)
 
 # pyolp_robotics
-A 3D graphic tool to sketch serial robots offline programming
+A 3D graphic tool to sketch serial robots offline programming\
+Full python framework, simple and easy to implement.
 
-Full python framework, simple and easy to implement 
 Robotic fk & ik implemented into a Pythonocc CAD kernel, enabling collision detection, 3d operations and trajectory planning in the same framework.\
-For the moment two robots are implemented : an UR10 from Universal Robot (6 axes) and an Iiwa from Kuka (7axes).
+For the moment two robots are available : an UR10 from Universal Robot (6 axes) and an Iiwa from Kuka (7axes).
 
 This tool is mainly a pedagogic tool to understand the basic concepts of robotic kinematics in a friendly programming environment.
 
@@ -14,7 +14,7 @@ Find robot's pose with a given configuration/3D frame to reach/collision environ
 The tool use [IKPY](https://github.com/Phylliade/ikpy) to solve the inverse kinematics of the robot model (but used my fork for compatibility with this repo) . The model is specified with its *Denavit Hartenberg* parameters.\
 Thanks to the [Pythonocc library](https://github.com/tpaviot/pythonocc-core) we can unleash the 3d operations possibilities, as it has the potential to treat nurbs objects.\
 It also enables a realistic visualisation of the poses and to define collisions environnement.\
-The [FCL python wrapper](https://pypi.org/project/python-fcl/) is used with Pythonocc to deal with collision, this is not optimized though.
+The [Flexible Collision Library python wrapper](https://pypi.org/project/python-fcl/) is used with Pythonocc to deal with collision, this is not optimized though.
 
 ## Examples / tests
 A simple forward kinematic example with sliders
@@ -74,12 +74,13 @@ Tried successfully using these interfaces with few minor ergonomic changes :\
 ## Warning
 This tool is mainly a pedagogic tool to understand the basic concepts of robotic kinematics
 - No garanty of good behavior, it works for me in the real world but use with cautious.
-- The inverse kinematics solver can only combine one orientation (Z in the planner) with the position (see https://github.com/Phylliade/ikpy/issues/138). With a tool aligned with the flange, it can be resolved by calculted the angle between the X direction of frame to reach and the TCP's one, turn accordingly the flange, test if pose is suitable for the robot and forward.
+- The inverse kinematics solver can only combine one orientation (Z in the planner) with the position (see https://github.com/Phylliade/ikpy/issues/138). With a tool aligned with the flange, it can be resolved by calculting the angle between the X direction of frame to reach and the TCP's one, turn accordingly the flange, test if pose is suitable for the robot and forward.
 - Trajectory planning and logic may be different from the one implemented in the robot's controller, use with cautious at low velocity for first tries\
 For a more robust solution you can check [ROS Industrial](https://rosindustrial.org/), which offers great tools and has a large community of developpers.
 
 ## Further work to be done
 Implement jacobian method to deal with trajectory speed and so on\
 add other robots\
+better interaction between robot's model and FCL mesh
 ...\
 feel free to contribute :)
