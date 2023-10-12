@@ -11,7 +11,7 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
-    package_data={'pyolp_robotics': ['robots/resources/**']},
+    package_data={'pyolp_robotics': ['robots/resources/**/**/*.stp']},
     classifiers=[
         'Development Status :: 1 - Planning',
         'Programming Language :: Python :: 3.4',
