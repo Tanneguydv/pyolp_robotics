@@ -89,7 +89,7 @@ class Application(QtWidgets.QMainWindow):
             slider.setOrientation(QtCore.Qt.Orientation(1))  
             slider.setTickPosition(QtWidgets.QSlider.TicksLeft)  
             slider.setTickInterval(5)  
-            slider.setSliderPosition(degrees(self.robot.home_config[i]))
+            slider.setSliderPosition(int(degrees(self.robot.home_config[i])))
             slider.valueChanged.connect(self.update_label_sliders)
             slider.valueChanged.connect(self.move_robot)
             self.sliders_axes[i] = slider
