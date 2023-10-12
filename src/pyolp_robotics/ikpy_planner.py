@@ -137,7 +137,14 @@ class Planner(object):
         recompute = True
         self.success = True
         while recompute :
-            self.compute_joints_angles(seed_initial=True)
+            while True :
+                try:
+                    self.compute_joints_angles(seed_initial=True)
+                except ValueError: # deal with infeasible least square methods
+                    print("error, retrying ...")
+                    self.initial_position = self.get_random_config()
+                    continue
+                break
             config_ikpy = self.get_joint_angle_trajectory()
             print("config_ikpy = ", config_ikpy[-1])
             self.robot.set_config(config_ikpy[-1])

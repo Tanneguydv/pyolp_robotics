@@ -1,5 +1,6 @@
 import pyolp_robotics.OCC_functions as occ
 import numpy as np
+import math
 from math import pi
 from ast import literal_eval as make_tuple
 import os
@@ -188,15 +189,21 @@ class Robot(ABC):
         self.change_config()
 
     def forward_k(self, config):
-        ok_config = True
+        self.set_config(config)
+        self.change_config()
+        # ok_config = self.check_config_limits(config)
+        # if ok_config:
+        #     self.set_config(config)
+        #     self.change_config()
+        # else:
+        #     print("config out of joint limits")
+
+    def check_config_limits(self, config):
         for i, j in enumerate(config):
-            if not self.joint_limits[i][0] < j < self.joint_limits[i][1]:
-                ok_config = False
-        if ok_config:
-            self.set_config(config)
-            self.change_config()
-        else:
-            print("config out of joint limits")
+            j_degrees = math.degrees(j)
+            if not self.joint_limits[i][0] < j_degrees < self.joint_limits[i][1]:
+                return False
+        return True
 
     def set_config(self, config):
         self.config = config
