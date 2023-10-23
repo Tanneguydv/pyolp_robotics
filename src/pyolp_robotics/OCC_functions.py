@@ -249,7 +249,7 @@ def rotate_shape(shape, axis, angle, unite="deg"):
     if type(shape) is gp_Pnt():
         print("point")
     else:
-        brep_trns = BRepBuilderAPI_Transform(shape, trns, True)
+        brep_trns = BRepBuilderAPI_Transform(shape, trns, False)
         brep_trns.Build()
         shp = brep_trns.Shape()
     return shp
