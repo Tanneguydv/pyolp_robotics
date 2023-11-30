@@ -4,7 +4,7 @@ channels:
 dependencies:
   - python=3.9
   - numpy
-  - pythonocc-core=7.7.0
+  - pythonocc-core=7.7.2
   - pip
   - pip :
     - git+https://github.com/Tanneguydv/ikpy
