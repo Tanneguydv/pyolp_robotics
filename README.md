@@ -5,7 +5,7 @@ A 3D graphic tool to sketch serial robots offline programming\
 Full python framework, simple and easy to implement.
 
 Robotic fk & ik implemented into a Pythonocc CAD kernel, enabling collision detection, 3d operations and trajectory planning in the same framework.\
-For the moment two robots are available : an UR10 from Universal Robot (6 axes) and an Iiwa from Kuka (7axes).
+For the moment two robots are available : an UR10 and an UR10e from Universal Robot (6 axes) and an Iiwa from Kuka (7axes).
 
 This tool is mainly a pedagogic tool to understand the basic concepts of robotic kinematics in a friendly programming environment.
 
