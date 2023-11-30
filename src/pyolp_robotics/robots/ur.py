@@ -12,7 +12,7 @@ class UR(Robot):
     def __init__(self, mesh=False):
         self.mesh = mesh
         super().__init__(mesh=self.mesh)
-        self.available_models = ['UR_10e']
+        self.available_models = ['UR10', 'UR10e']
         self.file_format = ".script"
 
     def post_processor(self, trajectory):
@@ -34,7 +34,7 @@ class UR(Robot):
             
         return txt
 
-class UR_10e(UR):
+class UR10(UR):
     def __init__(self, mesh=False) -> None:
         self.mesh = mesh
         super().__init__(mesh=self.mesh)
@@ -43,11 +43,11 @@ class UR_10e(UR):
 
     def set_robot_model(self):
         self.available_tools = ['grinding']
-        dir_ = "resources/UR_10e"
+        dir_ = "resources/UR10"
         # get the dir full path
         dir_fullpath = os.path.join(os.path.dirname(__file__), dir_)
         self.path_directory = dir_fullpath
-        self.robot_name = 'UR10_e'
+        self.robot_name = 'UR10'
         self._reach = 1300 # in millimeters
         self.nb_axes = 6
         self.color = 268
@@ -98,5 +98,66 @@ class UR_10e(UR):
             print("please enter a valid range for joints limits")
     
 
+class UR10e(UR):
+    def __init__(self, mesh=False) -> None:
+        self.mesh = mesh
+        super().__init__(mesh=self.mesh)
+        self.set_robot_model()
+        self.process_directory()
 
+    def set_robot_model(self):
+        self.available_tools = []
+        dir_ = "resources/UR10e"
+        # get the dir full path
+        dir_fullpath = os.path.join(os.path.dirname(__file__), dir_)
+        self.path_directory = dir_fullpath
+        self.robot_name = 'UR10e'
+        self._reach = 1300 # in millimeters
+        self.nb_axes = 6
+        self.color = 268
+        self.material = Graphic3d_NOM_STONE
+        # dh_params [n, 4]
+        # |  d  |  a  |  alpha  |  theta  |
+        # |  x  |  x  |    x    |    x    |
+        # dh_params_UR https://www.universal-robots.com/articles/ur/application-installation/dh-parameters-for-calculations-of-kinematics-and-dynamics/
+        self._dh_params = np.array([
+            [  0.181, 0., pi/2, 0.],
+            [  0., -0.613, 0, 0.],
+            [  0., -0.571, 0, 0.],
+            [  0.174, 0.,  pi/2, 0.],
+            [  0.120, 0.,  -pi/2, 0.],
+            [  0.117, 0., 0, 0.]])   
+        # radians
+        self.home_config = [0, -pi/2, 0, -pi/2, 0, 0] 
+        self._joint_limits =  [
+                        (-360, 360),  
+                        (-360, 360),  
+                        (-360, 360), 
+                        (-360, 360),   
+                        (-360, 360), 
+                        (-360, 360)] 
+        
+    @property
+    def dh_params(self):
+        return self._dh_params
+    
+    @property
+    def reach(self):
+        return self._reach
+    
+    @property
+    def joint_limits(self):
+        return self._joint_limits
+    
+    @joint_limits.setter
+    def joint_limits(self, new_joint_limits):
+        valid = True
+        for j_limit in new_joint_limits:
+            min_limit, max_limit = j_limit
+            if not min_limit< 0 and not max_limit>0:
+                valid = False
+        if valid:
+            self._joint_limits = new_joint_limits
+        else: 
+            print("please enter a valid range for joints limits")
         

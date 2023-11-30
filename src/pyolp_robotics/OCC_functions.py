@@ -133,7 +133,7 @@ def dir_rotation(shape, point, dir_, angle):
         trns = gp_Trsf()
         trns.SetRotation(axis, angle)
         # trns.SetRotation(axis,angle)
-        brep_trns = BRepBuilderAPI_Transform(shape, trns, True)
+        brep_trns = BRepBuilderAPI_Transform(shape, trns, False)
         brep_trns.Build()
         shape_rot = brep_trns.Shape()
         return shape_rot
@@ -249,7 +249,7 @@ def rotate_shape(shape, axis, angle, unite="deg"):
     if type(shape) is gp_Pnt():
         print("point")
     else:
-        brep_trns = BRepBuilderAPI_Transform(shape, trns, True)
+        brep_trns = BRepBuilderAPI_Transform(shape, trns, False)
         brep_trns.Build()
         shp = brep_trns.Shape()
     return shp
@@ -841,4 +841,30 @@ def fcl_collisions_collection_shapes(shapes, stop_at_first=True):
             shapes_colliding.append(cutter)
             if stop_at_first :
                 continue_searching = False
+    return collision, shapes_colliding
+
+def check_two_part_collisions(part1, part2):
+    collision = False
+    basis = part1
+    cutter = part2
+    result = BRepAlgoAPI_Section(basis, cutter).Shape()
+    if result.NbChildren() > 0:
+        collision = True
+    return collision
+
+def check_collections_collisions(shapes, stop_at_first=True):
+    continue_searching = True
+    collision = False
+    shapes_colliding = []
+    for two_solids in combinations(shapes, 2):
+        if continue_searching:
+            basis = two_solids[0]
+            cutter = two_solids[1]
+            result = BRepAlgoAPI_Section(basis, cutter).Shape()
+            if result.NbChildren() > 0:
+                collision = True
+                shapes_colliding.append(basis)
+                shapes_colliding.append(cutter)
+                if stop_at_first :
+                    continue_searching = False
     return collision, shapes_colliding
