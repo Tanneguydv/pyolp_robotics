@@ -3,7 +3,7 @@ import sys
 sys.path.append(os.path.realpath(os.curdir)) 
 
 from OCC.Display.backend import load_backend
-load_backend("qt-pyqt5")
+load_backend("pyqt5")
 import OCC.Display.qtDisplay as qtDisplay
 
 import pyolp_robotics.OCC_functions as occ
