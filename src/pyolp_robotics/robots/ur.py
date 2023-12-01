@@ -42,7 +42,6 @@ class UR10(UR):
         self.process_directory()
 
     def set_robot_model(self):
-        self.available_tools = ['grinding']
         dir_ = "resources/UR10"
         # get the dir full path
         dir_fullpath = os.path.join(os.path.dirname(__file__), dir_)
@@ -61,9 +60,10 @@ class UR10(UR):
             [  0., -0.612, 0, 0.],
             [  0., -0.5723, 0, 0.],
             [  0.163941, 0.,  pi/2, 0.],
-            [  0.1147, 0.,  -pi/2, 0.],
+            [  0.1157, 0.,  -pi/2, 0.],
             [  0.0922, 0., 0, 0.]])   
         # radians
+        self.import_config = [0, 0, 0, 0, 0, 0]
         self.home_config = [0, -pi/2, 0, -pi/2, 0, 0] 
         self._joint_limits =  [
                         (-360, 360),  
@@ -106,7 +106,6 @@ class UR10e(UR):
         self.process_directory()
 
     def set_robot_model(self):
-        self.available_tools = []
         dir_ = "resources/UR10e"
         # get the dir full path
         dir_fullpath = os.path.join(os.path.dirname(__file__), dir_)
@@ -128,6 +127,7 @@ class UR10e(UR):
             [  0.120, 0.,  -pi/2, 0.],
             [  0.117, 0., 0, 0.]])   
         # radians
+        self.import_config = [0, 0, 0, 0, 0, 0]
         self.home_config = [0, -pi/2, 0, -pi/2, 0, 0] 
         self._joint_limits =  [
                         (-360, 360),  

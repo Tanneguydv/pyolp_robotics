@@ -7,7 +7,7 @@ load_backend("pyqt5")
 import OCC.Display.qtDisplay as qtDisplay
 
 import pyolp_robotics.OCC_functions as occ
-from pyolp_robotics.robots.ur import UR10e
+from pyolp_robotics.robots.ur import UR10
 
 from math import pi, radians, degrees
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -107,7 +107,7 @@ class Application(QtWidgets.QMainWindow):
         self.labels[slider_name].setText(f"Axe {slider_name}: {value}")  # update the label
 
     def load_robot(self):
-        self.robot = UR10e(mesh=False)
+        self.robot = UR10(mesh=False)
         self.robot.initialise_robot()
         self.robot.go_home()
         self.layer_robot = occ.Layer(self.display, color=self.robot.color, material=self.robot.material)

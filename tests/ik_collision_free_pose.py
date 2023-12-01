@@ -14,6 +14,7 @@ rob.initialise_robot()
 rob.set_tool("grinding")
 
 planner = Planner(rob)
+planner.set_tolerance(0.1)
 config_initial = rob.config
 
 ax3_1 = occ.gp_Ax3(occ.gp_Pnt(1112,-209,40), occ.gp_Dir(0,0,-1))
@@ -33,6 +34,7 @@ if planner.success:
 else:
     display.DisplayShape(rob.get_compound(), color="red", material=rob.material)
 
+display.DisplayShape(planner.ax3_recomputed.Location(), color=2)
 display.FitAll()
 start_display()
 

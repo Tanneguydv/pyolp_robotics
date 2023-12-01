@@ -29,7 +29,6 @@ class Iiwa(Kuka):
         # self.initialise_robot()
 
     def set_robot_model(self):
-        self.available_tools = ['tool_simple']
         dir_ = "resources/LBR_IIWA_14_R820"
         # get the dir full path
         dir_fullpath = os.path.join(os.path.dirname(__file__), dir_)
@@ -52,6 +51,7 @@ class Iiwa(Kuka):
             [  0., 0., -pi/2, 0.],
             [  0.126, 0., 0, 0.]])
         # radians
+        self.import_config = [0, 0, 0, 0, 0, 0]
         self.home_config = [0, 0, 0, 0, 0, 0, 0]   
         self._joint_limits =  [
                         (-170 , 170),  # Limite articulation 0 (en degrés)

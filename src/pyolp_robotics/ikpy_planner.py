@@ -18,11 +18,11 @@ class Planner(object):
         self.joint_angle_trajectory = []
         self.initial_position = None
         self.collision_environment = occ.Sphere(occ.gp_Pnt(), 1)
-        self.tolerance = 0.1
+        self.tolerance = 0.5
 
     def create_sym_robot(self):
         # get flange offset value
-        self.flange_offset = abs(self.robot.dh_params[-1][0])*1000 
+        self.flange_offset = 0 #abs(self.robot.dh_params[-1][0])*1000 
         # create a list of links for the robot
         links = []
         self.link_lengths = []
@@ -52,14 +52,16 @@ class Planner(object):
     
     def process_ax3_to_frame_tool(self, ax3s):
         ax1 = occ.gp_Ax3(occ.gp_Pnt(), occ.gp_Dir(0,0,-1), occ.gp_Dir(1,0,0))
+        self.ax3s_to_go_to = []
         for i, frames in enumerate(ax3s):
             self.waypoints.append(i)
             self.waypoints[i] = []
             for frame in frames:
+                self.ax3s_to_go_to.append(frame)
                 # apply transformations to the frame
                 frame_trsf= occ.gp_Trsf()
                 frame_trsf.SetTransformation(frame, occ.gp_Ax3())
-                frame_trsf.Multiply(self.robot.tool_flange_trsf)
+                frame_trsf.Multiply(self.robot.flange_tool_trsf)
                 # define the coordinates of the transformed frame
                 ax3 = occ.gp_Ax3().Transformed(frame_trsf)
                 ax3 = occ.offset_with_dir_ax3(ax3, ax3.Direction(), self.flange_offset)
@@ -86,10 +88,13 @@ class Planner(object):
     
     def process_ax3_to_frame(self,ax3s):
         ax1 = occ.gp_Ax3(occ.gp_Pnt(), occ.gp_Dir(0,0,1), occ.gp_Dir(1,0,0))
+        self.ax3s_to_go_to = []
         for i, ax3_ in enumerate(ax3s):
             self.waypoints.append(i)
             self.waypoints[i] = []
             for ax3 in ax3_:
+                self.ax3_recomputed = ax3
+                self.ax3s_to_go_to.append(ax3)
                 euler_angle = occ.get_euler_angles(ax3, ax1, degres=False)
                 self.waypoints[i].append(
                     [euler_angle[2], 
@@ -120,15 +125,49 @@ class Planner(object):
         flat_list = [item for sublist in self.waypoints for item in sublist]
         return len(flat_list)
 
-    def compute_joints_angles(self, seed_initial=True):
+    def compute_joints_angles(self, seed_initial=True, timeout=10):
         self.joint_angle_trajectory = []
-        for frame in self.frames:
-            target_position, target_orientation = frame
-            joint_angles = self.chain.inverse_kinematics(target_position=target_position, target_orientation=target_orientation, orientation_mode="Z",
-                                        initial_position=self.initial_position)
-            self.joint_angle_trajectory.append(joint_angles)
-            if seed_initial:
-                self.initial_position = joint_angles
+        for i, frame in enumerate(self.frames):
+            start_time = time.time()
+            recompute = True
+            while recompute:
+                target_position, target_orientation = frame
+                while True :
+                    try:               
+                        joint_angles = self.chain.inverse_kinematics(target_position=target_position, target_orientation=target_orientation, orientation_mode="Z",
+                                            initial_position=self.initial_position)
+                    except ValueError: # deal with infeasible least square methods
+                        print("error, retrying ...")
+                        self.initial_position[-1] = self.initial_position[-1]-0.01
+                        continue
+                    break
+                # if final_distance < self.tolerance:
+                angle = 100 
+                pose = joint_angles
+                while abs(angle) > 0.5 and recompute:
+                    elapsed_time = time.time() - start_time
+                    self.robot.forward_k(pose)
+                    ax3_tool_recompute = self.robot.tool_ax3
+                    angle = self.ax3s_to_go_to[i].XDirection().AngleWithRef(self.robot.tool_ax3.XDirection(), self.ax3s_to_go_to[i].XDirection())
+                    print("angle tool = ", math.degrees(angle), angle)
+                    pose[-1] = pose[-1] + angle
+                    print("pose = ", pose)
+                    if elapsed_time > timeout:
+                        recompute = False
+                        self.joint_angle_trajectory.append(pose)
+                final_distance = self.robot.get_tcp_ax3().Location().Distance(self.ax3s_to_go_to[i].Location())
+                print(final_distance)
+                elapsed_time = time.time() - start_time
+                if final_distance < self.tolerance:
+                    recompute = False
+                    self.joint_angle_trajectory.append(pose)
+                elif elapsed_time > timeout:
+                    recompute = False
+                    self.joint_angle_trajectory.append(pose)
+                if seed_initial:
+                    self.initial_position = joint_angles
+                else:
+                    self.initial_position = self.get_random_config()
     
     def get_pose_collision_free(self, ax3, config_initial, timeout=100, selfcollision_check=False):
         self.initial_position = config_initial
@@ -139,7 +178,7 @@ class Planner(object):
         while recompute :
             while True :
                 try:
-                    self.compute_joints_angles(seed_initial=True)
+                    self.compute_joints_angles(seed_initial=False)
                 except ValueError: # deal with infeasible least square methods
                     print("error, retrying ...")
                     self.initial_position = self.get_random_config()
@@ -147,8 +186,7 @@ class Planner(object):
                 break
             config_ikpy = self.get_joint_angle_trajectory()
             print("config_ikpy = ", config_ikpy[-1])
-            self.robot.set_config(config_ikpy[-1])
-            self.robot.change_config()
+            self.robot.forward_k(config_ikpy[-1])
             if selfcollision_check :
                 all_shapes = self.robot.get_axes()
                 all_shapes.append(self.collision_environment)
@@ -159,14 +197,18 @@ class Planner(object):
                 # config = self.rebase_config_domain(config_ikpy[-1])
                 articular_limit_ok = self.check_articular_limits(config_ikpy[-1])
                 collision_nondist_checked = articular_limit_ok
-                if not collision_nondist_checked : #TODO works only with TCP
+                print("articular limit ", articular_limit_ok)
+                if articular_limit_ok : 
                     final_distance = self.robot.get_tcp_ax3().Location().Distance(ax3.Location())
                     print("final distance = ", final_distance)
                     if final_distance < self.tolerance:
                         recompute = False
+                    elif final_distance < 25:
+                        self.initial_position = config_ikpy[-1]
+                    else:
+                        config_initial = self.get_random_config()
+                        self.initial_position = config_initial
             print("recomputing? ", recompute)
-            config_initial = self.get_random_config()
-            self.initial_position = config_initial
             elapsed_time = time.time() - start_time
             if elapsed_time > timeout:
                 recompute = False
@@ -204,8 +246,8 @@ class Planner(object):
             min_limit, max_limit = math.radians(self.robot.joint_limits[i][0]), math.radians(self.robot.joint_limits[i][1])
             # print("articular limit = " , min_limit, val, max_limit)
             if val < min_limit or val > max_limit:
-                return True
-        return False
+                return False
+        return True
     
     def intermediate_pose(self, nb_pt, config_1, step_change_config): 
         intermediate_config = []
