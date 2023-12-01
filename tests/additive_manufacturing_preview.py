@@ -3,13 +3,13 @@ import sys
 sys.path.append(os.path.realpath(os.curdir)) 
 
 import pyolp_robotics.OCC_functions as occ
-from pyolp_robotics.robots.ur import UR10
+from pyolp_robotics.robots.ur import UR10e
 from pyolp_robotics.ikpy_planner import Planner
 
 from OCC.Display.SimpleGui import init_display
 display, start_display, add_menu, add_function_to_menu = init_display()
 
-rob = UR10(mesh=False)
+rob = UR10e(mesh=False)
 rob.initialise_robot()
 rob.set_tool("grinding")
 # set new joint limits 

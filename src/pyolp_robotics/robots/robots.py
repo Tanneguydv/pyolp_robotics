@@ -29,15 +29,19 @@ class Robot(ABC):
 
     def process_directory(self):
         for filename in os.listdir(self.path_directory):
-                f = os.path.join(self.path_directory, filename)
-                if 'tools' in filename:
-                    self.tools_directory = f
-                if "_stp" in filename:
-                    self.axes_step_directory = f
-                if "axes_stl" in filename:
-                    self.axes_stl_directory = f
-                if "txt" in filename:
-                    self.ax3_directory = f
+            f = os.path.join(self.path_directory, filename)
+            # Check if 'tools' is in the parent directory
+            parent_directory = os.path.dirname(self.path_directory)
+            tools_directory = os.path.join(parent_directory, 'tools')
+            if os.path.isdir(tools_directory):
+                # 'tools' directory is in the parent directory
+                self.tools_directory = tools_directory
+            if "_stp" in filename:
+                self.axes_step_directory = f
+            if "axes_stl" in filename:
+                self.axes_stl_directory = f
+            if "txt" in filename:
+                self.ax3_directory = f
 
     def get_ax3_from_DH(self, dh_params):
         # dh_params [n, 4]
@@ -122,7 +126,8 @@ class Robot(ABC):
                         self.axes[axe_number-1] = occ.read_step_file(f)
                         print("axe number -1 =", axe_number-1, filename)
                         self.axes_original[axe_number-1] = occ.read_step_file(f)
-
+        self.flange = self.axes_original[-1]
+        self.set_flange_frame()
         self.config = []
         for a in self.home_config:
               self.config.append(0)
@@ -130,15 +135,53 @@ class Robot(ABC):
         self.change_config()
         print(" 1",self.config)
         self.initial_frame = self.ax3s[-1]
+        # self.set_flange_frame()
+
+    def set_flange_frame(self):
+        _, _, box = occ.get_aligned_boundingbox(self.flange)
+        ax3 = self.get_ax3s()[-1]
+        edge = occ.create_edge(ax3.Location(), ax3.Direction(), 150)
+        points = occ.Section(box, edge)
+        pnts = occ.TopExplorer(points, "vertex")
+        axe_origin = ax3.Location()
+        maximal_distance = 0
+        extreme_pnt = None
+        for pnt in pnts:
+            distance = pnt.Distance(axe_origin)
+            if distance > maximal_distance:
+                maximal_distance = distance
+                extreme_pnt = pnt
+    
+        ax3_flange = occ.offset_with_dir_ax3(self.get_ax3s()[-1], self.get_ax3s()[-1].Direction(), maximal_distance)
+        self.ax3s[-1] = ax3_flange
+        self.ax3s_original[-1] = ax3_flange
+        self.trsf_flange_world = occ.get_trsf_2ax3(ax3_flange, occ.gp_Ax3())
 
     def set_tool(self, tool_name):
-        print('set ', tool_name)
+        actual_config = self.config
+        self.forward_k(self.import_config)
+        if self.has_tool:
+            self.unset_tool()
         for filename in os.listdir(self.tools_directory):
             f = os.path.join(self.tools_directory, filename)
             # checking if it is a file
             if os.path.isfile(f):
-                print('f=', f)
-                if "txt" in filename and tool_name in filename:
+                full_bride_name, extension = os.path.splitext(filename)
+                if extension == '.stp' or extension == '.step':
+                    if '-' in filename:
+                        pass
+                    else:
+                        print('f=', f)
+                        if tool_name in filename:
+                            print('tool_name_for_step =', tool_name)
+                            tool = occ.read_step_file(f)
+                            flange_moved = occ.trsf(tool, self.trsf_flange_world)
+                            new_flange = occ.create_compound([self.axes_original[-1], flange_moved])
+                            self.axes_original[-1] = new_flange
+                            self.axes[-1] = new_flange
+                            # self.flange_tool_trsf = occ.gp_Trsf()
+                            self.has_tool = True
+                elif "txt" in filename and tool_name in filename:
                     with open(f, "r") as file:
                         for i in file.readlines():
                             try :
@@ -149,16 +192,16 @@ class Robot(ABC):
                                 ax3 = occ.gp_Ax3(occ.gp_Pnt(*xyz), occ.gp_Dir(*nxyz))
                             self.tool_ax3 = ax3
                             self.original_tool_ax3 = ax3
-                            self.tool_flange_trsf = occ.get_trsf_2ax3(self.ax3s_original[-1], self.tool_ax3)
-                            self.flange_tool_trsf = self.tool_flange_trsf.Inverted()
-                            print('trsf =', self.flange_tool_trsf)
-                elif tool_name in filename:
-                    print('tool_name_for_step =', tool_name)
-                    tool = occ.read_step_file(f)
-                    new_flange = occ.create_compound([self.axes_original[-1], tool])
-                    self.axes_original[-1] = new_flange
-                    self.axes[-1] = new_flange
-                    self.has_tool = True
+                            self.flange_tool_trsf = occ.get_trsf_2ax3(occ.gp_Ax3(), self.tool_ax3)                           
+                            self.tool_flange_trsf = self.flange_tool_trsf.Inverted()
+                            print('trsf =', self.tool_flange_trsf)
+        self.forward_k(actual_config)
+
+    def unset_tool(self):
+        if self.has_tool:
+            self.axes_original[-1] = self.flange
+            self.has_tool = False
+            self.change_config()
                 
     def get_ax3s(self):
         return self.ax3s
@@ -220,7 +263,7 @@ class Robot(ABC):
         if self.has_tool:
             transformation_repere_tool = occ.gp_Trsf()
             transformation_repere_tool.SetTransformation(self.ax3s[-1], occ.gp_Ax3())
-            transformation_repere_tool.Multiply(self.flange_tool_trsf)
+            transformation_repere_tool.Multiply(self.tool_flange_trsf)
             self.tool_ax3 = occ.gp_Ax3().Transformed(transformation_repere_tool)
 
     def set_original_axes(self): 

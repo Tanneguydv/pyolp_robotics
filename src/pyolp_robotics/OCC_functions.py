@@ -618,7 +618,7 @@ def TopExplorer(shape, to_find=None, filter_pts=0.01):
         return compounds
 
     # find compsolids
-    elif to_find == "composolid":
+    elif to_find == "compsolid":
         topexp_compsolid = TopExp_Explorer()
         topexp_compsolid.Init(shape, TopAbs_COMPSOLID)
         compsolids = []
