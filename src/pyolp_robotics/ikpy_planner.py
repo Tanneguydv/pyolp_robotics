@@ -9,6 +9,8 @@ import heapq
 from math import pi, sqrt, sin, cos, atan2, radians, degrees
 
 import pyolp_robotics.OCC_functions as occ
+import pyolp_robotics.collision
+
 
 class Planner(object):
     def __init__(self, robot) -> None:
@@ -192,7 +194,7 @@ class Planner(object):
                 all_shapes.append(self.collision_environment)
             else :
                 all_shapes = [self.collision_environment, self.robot.get_compound()]
-            collision_non_ang_checked, shapes_colliding = occ.check_collections_collisions(all_shapes)
+            collision_non_ang_checked, shapes_colliding = pyolp_robotics.collision.check_collections_collisions(all_shapes)
             if not collision_non_ang_checked:
                 # config = self.rebase_config_domain(config_ikpy[-1])
                 articular_limit_ok = self.check_articular_limits(config_ikpy[-1])
