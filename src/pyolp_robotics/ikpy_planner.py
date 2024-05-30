@@ -9,10 +9,12 @@ import heapq
 from math import pi, sqrt, sin, cos, atan2, radians, degrees
 
 import pyolp_robotics.OCC_functions as occ
+import pyolp_robotics.collision as pyocccollision
 
 class Planner(object):
-    def __init__(self, robot) -> None:
+    def __init__(self, robot, display=None) -> None:
         self.robot = robot
+        self.display = display
         self.chain = self.create_sym_robot()
         self.inter_values = []
         self.joint_angle_trajectory = []
@@ -192,7 +194,7 @@ class Planner(object):
                 all_shapes.append(self.collision_environment)
             else :
                 all_shapes = [self.collision_environment, self.robot.get_compound()]
-            collision_non_ang_checked, shapes_colliding = occ.check_collections_collisions(all_shapes)
+                collision_non_ang_checked, shapes_colliding = pyocccollision.check_collections_collisions(all_shapes, display_ais=self.display)
             if not collision_non_ang_checked:
                 # config = self.rebase_config_domain(config_ikpy[-1])
                 articular_limit_ok = self.check_articular_limits(config_ikpy[-1])

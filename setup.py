@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pyolp_robotics',
-    version='0.0.2',    
+    version='0.0.3',    
     description='A full python framework for robot offline progamming',
     url='https://github.com/Tanneguydv/pyolp_robotics',
     author='Tanneguy de Villemagne',
@@ -14,11 +14,8 @@ setup(
     package_data={'pyolp_robotics': ['robots/resources/**/**/*.stp', 'robots/resources/**/**/*.txt']},
     classifiers=[
         'Development Status :: 1 - Planning',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
     ],
 )

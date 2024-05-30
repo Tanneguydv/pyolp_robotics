@@ -12,7 +12,7 @@ This tool is mainly a pedagogic tool to understand the basic concepts of robotic
 ## Use
 Find robot's pose with a given configuration/3D frame to reach/collision environment/etc.\
 The tool use [IKPY](https://github.com/Phylliade/ikpy) to solve the inverse kinematics of the robot model (but used my fork for compatibility with this repo) . The model is specified with its *Denavit Hartenberg* parameters.\
-Thanks to the [Pythonocc library](https://github.com/tpaviot/pythonocc-core) we can unleash the 3d operations possibilities, as it has the potential to treat nurbs objects.\
+Thanks to the [Pythonocc library](https://github.com/tpaviot/pythonocc-core) we can unleash the 3d operations possibilities, as it has the potential to treat nurbs objects. pythonocc-core=7.8.1 is used along with PySide6.\
 It also enables a realistic visualisation of the poses and to define collisions environnement.\
 The [Flexible Collision Library python wrapper](https://pypi.org/project/python-fcl/) is used with Pythonocc to deal with collision, this is not optimized though.
 

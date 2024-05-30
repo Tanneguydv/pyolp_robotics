@@ -13,7 +13,7 @@ rob = UR10(mesh=False)
 rob.initialise_robot()
 rob.set_tool("grinding")
 
-planner = Planner(rob)
+planner = Planner(rob, display)
 planner.set_tolerance(0.1)
 config_initial = rob.config
 
