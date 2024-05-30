@@ -3,14 +3,14 @@ import sys
 sys.path.append(os.path.realpath(os.curdir)) 
 
 from OCC.Display.backend import load_backend
-load_backend("pyqt5")
+load_backend("pyside6")
 import OCC.Display.qtDisplay as qtDisplay
 
 import pyolp_robotics.OCC_functions as occ
 from pyolp_robotics.robots.ur import UR10
 
 from math import pi, radians, degrees
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
