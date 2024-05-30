@@ -79,7 +79,8 @@ from OCC.Core.TopoDS import (
     topods_Face,
     TopoDS_Iterator,
     TopoDS_Shape,
-    TopoDS_Shell,
+    TopoDS_Shell, 
+    TopoDS_Vertex,
 )
 
 from OCC.Extend.ShapeFactory import *
@@ -91,10 +92,7 @@ from OCCUtils.edge import Edge
 from OCCUtils.Topology import Topo
 
 import collections
-import fcl
 import time
-from itertools import combinations
-import numpy as np
 import math
 
 def create_vec_2pts(from_pnt, to_pnt):
@@ -782,89 +780,3 @@ def mesh_from_brep(occ_brep, theLinDeflection=0.8):
                 ]
     )
     return triangles
-
-def print_collision_result(o1_name, o2_name, result):
-    print("Collision between {} and {}:".format(o1_name, o2_name))
-    print("-" * 30)
-    print("Collision?: {}".format(result.is_collision))
-    print("Number of contacts: {}".format(len(result.contacts)))
-    print("")
-
-def fcl_collision_object_from_shape(shape1, shape2):
-    """
-    create a fcl.BVHModel instance from the `shape` TopoDS_Shape
-    """
-    triangles = mesh_from_brep(shape1)
-    triangles = np.array(triangles)
-    # Create mesh geometry
-    _mesh1 = fcl.BVHModel()
-    n_tris = len(triangles)
-    _mesh1.beginModel(n_tris, n_tris * 3)
-    for tri in triangles:
-        x, y, z = tri
-        _mesh1.addTriangle(x, y, z)
-    _mesh1.endModel()
-
-    triangles2 = mesh_from_brep(shape2)
-    triangles2 = np.array(triangles2)
-    # Create mesh geometry
-    _mesh2 = fcl.BVHModel()
-    n_tris = len(triangles2)
-    _mesh2.beginModel(n_tris, n_tris * 3)
-    for tri in triangles2:
-        x, y, z = tri
-        _mesh2.addTriangle(x, y, z)
-    _mesh2.endModel()
-
-    req = fcl.CollisionRequest(enable_contact=True)
-    res = fcl.CollisionResult()
-
-    n_contacts = fcl.collide(
-    fcl.CollisionObject(_mesh1, fcl.Transform()),
-    fcl.CollisionObject(_mesh2, fcl.Transform()),
-    req,
-    res,
-    )
-    print_collision_result("_mesh1", "_mesh2", res)
-    return res.is_collision
-
-def fcl_collisions_collection_shapes(shapes, stop_at_first=True):
-    continue_searching = True
-    shapes_colliding = []
-    for two_solids in combinations(shapes, 2):
-        if continue_searching:
-            basis = two_solids[0]
-            cutter = two_solids[1]
-            collision = fcl_collision_object_from_shape(basis, cutter) 
-        if collision is True :
-            shapes_colliding.append(basis)
-            shapes_colliding.append(cutter)
-            if stop_at_first :
-                continue_searching = False
-    return collision, shapes_colliding
-
-def check_two_part_collisions(part1, part2):
-    collision = False
-    basis = part1
-    cutter = part2
-    result = BRepAlgoAPI_Section(basis, cutter).Shape()
-    if result.NbChildren() > 0:
-        collision = True
-    return collision
-
-def check_collections_collisions(shapes, stop_at_first=True):
-    continue_searching = True
-    collision = False
-    shapes_colliding = []
-    for two_solids in combinations(shapes, 2):
-        if continue_searching:
-            basis = two_solids[0]
-            cutter = two_solids[1]
-            result = BRepAlgoAPI_Section(basis, cutter).Shape()
-            if result.NbChildren() > 0:
-                collision = True
-                shapes_colliding.append(basis)
-                shapes_colliding.append(cutter)
-                if stop_at_first :
-                    continue_searching = False
-    return collision, shapes_colliding
