@@ -14,8 +14,8 @@ Find robot's pose with a given configuration/3D frame to reach/collision environ
 The tool use [IKPY](https://github.com/Phylliade/ikpy) to solve the inverse kinematics of the robot model (but used my fork for compatibility with this repo) . The model is specified with its *Denavit Hartenberg* parameters.\
 Thanks to the [Pythonocc library](https://github.com/tpaviot/pythonocc-core) we can unleash the 3d operations possibilities, as it has the potential to treat nurbs objects. pythonocc-core=7.8.1 is used along with PySide6.\
 It also enables a realistic visualisation of the poses and to define collisions environnement.\
-The [Flexible Collision Library python wrapper](https://pypi.org/project/python-fcl/) is used with Pythonocc to deal with collision, this is not optimized though.
-@jf--- has reworked the collision using AIS from pythonocc, and it works well, thank you for your contribution!
+The [Flexible Collision Library python wrapper](https://pypi.org/project/python-fcl/) is used with Pythonocc to deal with collision, this is not optimized though.\
+[@jf---](https://github.com/jf---) has reworked the collision using AIS from pythonocc, and it works well, thank you for your contribution!
 
 ## Examples / tests
 A simple forward kinematic example with sliders
